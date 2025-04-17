@@ -52,8 +52,8 @@ export class UploadComponent {
       title: video.title,
       description: video.description,
       videoUrl: video.videoUrl,
-      thumbnail: video.thumbnail,
-      thumbnailUrl: video.thumbnailUrl
+      thumbnail: video.thumbnailUrl || '',
+      thumbnailUrl: video.thumbnailUrl || ''
     };
     this.isPlaylistSelectorOpen = true;
   }
