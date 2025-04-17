@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -16,6 +17,8 @@ import { RouterModule } from '@angular/router';
         <button>Rechercher</button>
       </div>
       <div class="auth-buttons">
+        <button *ngIf="isLoggedIn" routerLink="/playlists">Mes playlists</button>
+        <button *ngIf="isLoggedIn" routerLink="/local-videos">Mes vidéos</button>
         <button *ngIf="isLoggedIn" routerLink="/upload">Upload</button>
         <button *ngIf="!isLoggedIn" routerLink="/auth/login">Se connecter</button>
         <button *ngIf="!isLoggedIn" routerLink="/auth/register">S'inscrire</button>
@@ -72,7 +75,12 @@ import { RouterModule } from '@angular/router';
 export class HeaderComponent {
   isLoggedIn = false;
 
+  constructor(private authService: AuthService) {
+    this.isLoggedIn = this.authService.isLoggedIn();
+  }
+
   logout() {
-    // TODO: Implémenter la déconnexion
+    this.authService.logout();
+    this.isLoggedIn = false;
   }
 }

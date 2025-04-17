@@ -33,6 +33,12 @@ export class PlaylistService {
     return this.playlists[user.email] || [];
   }
 
+  getPlaylistById(id: string): Playlist | undefined {
+    const user = this.authService.getCurrentUser();
+    if (!user) return undefined;
+    return this.playlists[user.email]?.find(p => p.id === id);
+  }
+
   createPlaylist(name: string): void {
     const user = this.authService.getCurrentUser();
     if (!user) return;

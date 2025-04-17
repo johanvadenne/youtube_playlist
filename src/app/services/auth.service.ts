@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 interface User {
-  username: string;
   email: string;
   password: string;
 }
@@ -28,13 +27,18 @@ export class AuthService {
     }
   }
 
-  register(username: string, email: string, password: string): boolean {
+  register(email: string, password: string, confirmPassword: string): boolean {
     // Vérifier si l'utilisateur existe déjà
     if (this.users.some(user => user.email === email)) {
       return false;
     }
 
-    const newUser: User = { username, email, password };
+    // Vérifier que les mots de passe correspondent
+    if (password !== confirmPassword) {
+      return false;
+    }
+
+    const newUser: User = { email, password };
     this.users.push(newUser);
     localStorage.setItem('users', JSON.stringify(this.users));
     return true;
