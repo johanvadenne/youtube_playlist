@@ -8,6 +8,7 @@ export interface LocalVideo {
   thumbnailUrl: string;
   thumbnail: string;
   filePath: string;
+  videoUrl: string;
 }
 
 @Injectable({
@@ -30,17 +31,8 @@ export class LocalVideoService {
     const fileName = `${Date.now()}-${video.file.name}`;
     video.filePath = this.VIDEOS_DIR + fileName;
 
-    // Sauvegarder le fichier vidéo
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        // Ici, vous devrez implémenter la logique pour sauvegarder le fichier
-        // dans le dossier public/assets/videos
-        // Note: Cette partie nécessite une implémentation côté serveur
-        console.log('Fichier vidéo à sauvegarder:', fileName);
-      }
-    };
-    reader.readAsArrayBuffer(video.file);
+    // Créer une URL pour la vidéo
+    video.videoUrl = URL.createObjectURL(video.file);
 
     this.videos.push(video);
     this.saveVideos();
@@ -57,9 +49,11 @@ export class LocalVideoService {
   deleteVideo(id: string): void {
     const video = this.videos.find(v => v.id === id);
     if (video) {
-      // Ici, vous devrez implémenter la logique pour supprimer le fichier vidéo
-      // du dossier public/assets/videos
-      console.log('Fichier vidéo à supprimer:', video.filePath);
+      // Libérer l'URL de la vidéo
+      URL.revokeObjectURL(video.videoUrl);
+      if (video.thumbnailUrl) {
+        URL.revokeObjectURL(video.thumbnailUrl);
+      }
     }
     this.videos = this.videos.filter(video => video.id !== id);
     this.saveVideos();

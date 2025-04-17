@@ -17,7 +17,7 @@ import { VideoService } from '../../services/video.service';
       <div class="videos-grid" *ngIf="playlist?.videos.length > 0; else noVideos">
         <div class="video-card" *ngFor="let video of playlist?.videos">
           <div class="video-thumbnail">
-            <img [src]="video.thumbnailUrl" [alt]="video.title">
+            <img [src]="video.thumbnail" [alt]="video.title">
           </div>
           <div class="video-info">
             <h3>{{ video.title }}</h3>
@@ -118,18 +118,14 @@ export class PlaylistDetailComponent implements OnInit {
     const playlistId = this.route.snapshot.paramMap.get('id');
     if (playlistId) {
       this.playlist = this.playlistService.getPlaylistById(playlistId);
-      if (this.playlist) {
-        this.playlist.videos = this.playlist.videos.map((videoId: string) =>
-          this.videoService.getVideoById(videoId)
-        ).filter(Boolean);
-      }
+      console.log('Playlist chargée:', this.playlist);
     }
   }
 
   removeFromPlaylist(videoId: string) {
     if (this.playlist) {
       this.playlistService.removeVideoFromPlaylist(this.playlist.id, videoId);
-      this.playlist.videos = this.playlist.videos.filter((video: any) => video.id !== videoId);
+      this.playlist = this.playlistService.getPlaylistById(this.playlist.id);
     }
   }
 }

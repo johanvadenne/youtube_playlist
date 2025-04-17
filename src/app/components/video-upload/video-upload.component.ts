@@ -124,7 +124,8 @@ export class VideoUploadComponent {
         file: this.videoFile,
         thumbnailUrl: this.thumbnailUrl || '',
         thumbnail: this.thumbnailUrl || '',
-        filePath: `/assets/videos/${Date.now()}-${this.videoFile.name}`
+        filePath: `/assets/videos/${Date.now()}-${this.videoFile.name}`,
+        videoUrl: this.videoUrl || ''
       };
       this.videoUploaded.emit(video);
       this.resetForm();

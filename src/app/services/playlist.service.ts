@@ -24,19 +24,24 @@ export class PlaylistService {
     const storedPlaylists = localStorage.getItem('playlists');
     if (storedPlaylists) {
       this.playlists = JSON.parse(storedPlaylists);
+      console.log('Playlists chargées:', this.playlists);
     }
   }
 
   getPlaylists(): Playlist[] {
     const user = this.authService.getCurrentUser();
     if (!user) return [];
-    return this.playlists[user.email] || [];
+    const userPlaylists = this.playlists[user.email] || [];
+    console.log('Playlists de l\'utilisateur:', userPlaylists);
+    return userPlaylists;
   }
 
   getPlaylistById(id: string): Playlist | undefined {
     const user = this.authService.getCurrentUser();
     if (!user) return undefined;
-    return this.playlists[user.email]?.find(p => p.id === id);
+    const playlist = this.playlists[user.email]?.find(p => p.id === id);
+    console.log('Playlist trouvée:', playlist);
+    return playlist;
   }
 
   createPlaylist(name: string): void {
@@ -64,6 +69,7 @@ export class PlaylistService {
     const playlist = this.playlists[user.email]?.find(p => p.id === playlistId);
     if (playlist) {
       playlist.videos.push(video);
+      console.log('Vidéo ajoutée à la playlist:', playlist);
       this.savePlaylists();
     }
   }
@@ -75,6 +81,7 @@ export class PlaylistService {
     const playlist = this.playlists[user.email]?.find(p => p.id === playlistId);
     if (playlist) {
       playlist.videos = playlist.videos.filter(v => v.id !== videoId);
+      console.log('Vidéo retirée de la playlist:', playlist);
       this.savePlaylists();
     }
   }
