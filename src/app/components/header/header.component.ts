@@ -16,6 +16,7 @@ import { RouterModule } from '@angular/router';
         <button>Rechercher</button>
       </div>
       <div class="auth-buttons">
+        <button *ngIf="isLoggedIn" routerLink="/upload">Upload</button>
         <button *ngIf="!isLoggedIn" routerLink="/auth/login">Se connecter</button>
         <button *ngIf="!isLoggedIn" routerLink="/auth/register">S'inscrire</button>
         <button *ngIf="isLoggedIn" (click)="logout()">Se déconnecter</button>

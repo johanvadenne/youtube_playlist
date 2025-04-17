@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SearchService } from '../../services/search.service';
 import { PlaylistService } from '../../services/playlist.service';
+import { PlaylistSelectorComponent } from '../../components/playlist-selector/playlist-selector.component';
 
 interface Video {
   id: string;
@@ -14,7 +15,7 @@ interface Video {
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PlaylistSelectorComponent],
   template: `
     <div class="search-container">
       <div class="search-bar">
@@ -33,7 +34,7 @@ interface Video {
             <h3>{{ video.title }}</h3>
             <p>{{ video.description }}</p>
             <div class="actions">
-              <button (click)="addToPlaylist(video)">Ajouter à une playlist</button>
+              <button (click)="openPlaylistSelector(video)">Ajouter à une playlist</button>
             </div>
           </div>
         </div>
@@ -42,6 +43,13 @@ interface Video {
           Aucun résultat trouvé
         </div>
       </div>
+
+      <app-playlist-selector
+        [isOpen]="isPlaylistSelectorOpen"
+        [video]="selectedVideo!"
+        (closeModal)="closePlaylistSelector()"
+        (playlistSelected)="onPlaylistSelected($event)">
+      </app-playlist-selector>
     </div>
   `,
   styles: [`
@@ -115,6 +123,8 @@ export class SearchComponent {
   searchQuery = '';
   searchResults: Video[] = [];
   isLoading = false;
+  isPlaylistSelectorOpen = false;
+  selectedVideo: Video | null = null;
 
   constructor(
     private searchService: SearchService,
@@ -132,8 +142,20 @@ export class SearchComponent {
       });
   }
 
-  addToPlaylist(video: Video) {
-    // TODO: Implémenter la sélection de playlist
-    alert('Fonctionnalité à implémenter');
+  openPlaylistSelector(video: Video) {
+    this.selectedVideo = video;
+    this.isPlaylistSelectorOpen = true;
+  }
+
+  closePlaylistSelector() {
+    this.isPlaylistSelectorOpen = false;
+    this.selectedVideo = null;
+  }
+
+  onPlaylistSelected(playlistId: string) {
+    if (this.selectedVideo) {
+      this.playlistService.addVideoToPlaylist(playlistId, this.selectedVideo);
+      this.closePlaylistSelector();
+    }
   }
 }
