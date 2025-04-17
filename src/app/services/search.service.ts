@@ -1,11 +1,5 @@
 import { Injectable } from '@angular/core';
-
-interface Video {
-  id: string;
-  title: string;
-  thumbnail: string;
-  description: string;
-}
+import { Video } from './video.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,20 +9,26 @@ export class SearchService {
     {
       id: '1',
       title: 'Tutoriel Angular 19',
+      description: 'Apprenez les bases d\'Angular 19',
+      videoUrl: 'https://example.com/video1.mp4',
       thumbnail: 'https://i.ytimg.com/vi/1.jpg',
-      description: 'Apprenez les bases d\'Angular 19'
+      thumbnailUrl: 'https://i.ytimg.com/vi/1.jpg'
     },
     {
       id: '2',
       title: 'Les meilleures pratiques TypeScript',
+      description: 'Découvrez les meilleures pratiques TypeScript',
+      videoUrl: 'https://example.com/video2.mp4',
       thumbnail: 'https://i.ytimg.com/vi/2.jpg',
-      description: 'Découvrez les meilleures pratiques TypeScript'
+      thumbnailUrl: 'https://i.ytimg.com/vi/2.jpg'
     },
     {
       id: '3',
       title: 'Création d\'une API REST',
+      description: 'Guide complet pour créer une API REST',
+      videoUrl: 'https://example.com/video3.mp4',
       thumbnail: 'https://i.ytimg.com/vi/3.jpg',
-      description: 'Guide complet pour créer une API REST'
+      thumbnailUrl: 'https://i.ytimg.com/vi/3.jpg'
     }
   ];
 

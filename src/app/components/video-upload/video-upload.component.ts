@@ -9,93 +9,90 @@ import { LocalVideo } from '../../services/local-video.service';
   imports: [CommonModule, FormsModule],
   template: `
     <div class="upload-container">
-      <h2>Ajouter une vidéo locale</h2>
-      <form (ngSubmit)="onSubmit()">
+      <form (ngSubmit)="onSubmit()" #uploadForm="ngForm">
         <div class="form-group">
-          <label for="title">Titre</label>
-          <input type="text" id="title" [(ngModel)]="title" name="title" required>
+          <label for="title">Titre de la vidéo</label>
+          <input type="text" id="title" name="title" [(ngModel)]="title" required>
         </div>
+
         <div class="form-group">
           <label for="description">Description</label>
-          <textarea id="description" [(ngModel)]="description" name="description" rows="3"></textarea>
+          <textarea id="description" name="description" [(ngModel)]="description"></textarea>
         </div>
+
         <div class="form-group">
-          <label for="video">Fichier vidéo</label>
-          <input type="file" id="video" (change)="onFileSelected($event)" accept="video/*" required>
+          <label for="videoFile">Fichier vidéo</label>
+          <input type="file" id="videoFile" name="videoFile" (change)="onVideoFileSelected($event)" accept="video/*" required>
+          <div *ngIf="videoFile" class="preview">
+            <video [src]="videoUrl" controls></video>
+          </div>
         </div>
+
         <div class="form-group">
-          <label for="thumbnail">Miniature (optionnel)</label>
-          <input type="file" id="thumbnail" (change)="onThumbnailSelected($event)" accept="image/*">
+          <label for="thumbnailFile">Miniature (optionnelle)</label>
+          <input type="file" id="thumbnailFile" name="thumbnailFile" (change)="onThumbnailFileSelected($event)" accept="image/*">
+          <div *ngIf="thumbnailFile" class="preview">
+            <img [src]="thumbnailUrl" alt="Aperçu de la miniature">
+          </div>
         </div>
-        <div class="preview" *ngIf="videoFile">
-          <video [src]="videoUrl" controls></video>
-          <img *ngIf="thumbnailUrl" [src]="thumbnailUrl" alt="Miniature">
-        </div>
-        <button type="submit" [disabled]="!isFormValid()">Ajouter la vidéo</button>
+
+        <button type="submit" [disabled]="!uploadForm.valid">Télécharger</button>
       </form>
     </div>
   `,
   styles: [`
     .upload-container {
-      padding: 2rem;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
     }
     .form-group {
-      margin-bottom: 1rem;
+      margin-bottom: 20px;
     }
     label {
       display: block;
-      margin-bottom: 0.5rem;
+      margin-bottom: 5px;
     }
     input[type="text"],
     textarea {
       width: 100%;
-      padding: 0.5rem;
+      padding: 8px;
       border: 1px solid #ddd;
       border-radius: 4px;
     }
-    input[type="file"] {
-      width: 100%;
-      padding: 0.5rem;
-    }
     .preview {
-      margin: 1rem 0;
+      margin-top: 10px;
     }
     .preview video,
     .preview img {
       max-width: 100%;
       max-height: 200px;
-      margin: 0.5rem 0;
     }
     button {
-      width: 100%;
-      padding: 0.75rem;
-      background-color: #ff0000;
+      background-color: #007bff;
       color: white;
+      padding: 10px 20px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      margin-top: 1rem;
     }
     button:disabled {
-      opacity: 0.5;
+      background-color: #ccc;
       cursor: not-allowed;
     }
   `]
 })
 export class VideoUploadComponent {
+  @Output() videoUploaded = new EventEmitter<LocalVideo>();
+
   title = '';
   description = '';
   videoFile: File | null = null;
   thumbnailFile: File | null = null;
-  videoUrl: string | null = null;
-  thumbnailUrl: string | null = null;
+  videoUrl = '';
+  thumbnailUrl = '';
 
-  @Output() videoUploaded = new EventEmitter<LocalVideo>();
-
-  onFileSelected(event: Event) {
+  onVideoFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       this.videoFile = input.files[0];
@@ -103,7 +100,7 @@ export class VideoUploadComponent {
     }
   }
 
-  onThumbnailSelected(event: Event) {
+  onThumbnailFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       this.thumbnailFile = input.files[0];
@@ -111,33 +108,20 @@ export class VideoUploadComponent {
     }
   }
 
-  isFormValid(): boolean {
-    return !!this.title && !!this.videoFile;
-  }
-
   onSubmit() {
-    if (this.isFormValid() && this.videoFile) {
-      const video: LocalVideo = {
-        id: Date.now().toString(),
-        title: this.title,
-        description: this.description,
-        file: this.videoFile,
-        thumbnailUrl: this.thumbnailUrl || '',
-        thumbnail: this.thumbnailUrl || '',
-        filePath: `/assets/videos/${Date.now()}-${this.videoFile.name}`,
-        videoUrl: this.videoUrl || ''
-      };
-      this.videoUploaded.emit(video);
-      this.resetForm();
-    }
-  }
+    if (!this.videoFile) return;
 
-  private resetForm() {
-    this.title = '';
-    this.description = '';
-    this.videoFile = null;
-    this.thumbnailFile = null;
-    this.videoUrl = null;
-    this.thumbnailUrl = null;
+    const video: LocalVideo = {
+      id: Date.now().toString(),
+      title: this.title,
+      description: this.description,
+      videoUrl: URL.createObjectURL(this.videoFile),
+      thumbnail: this.thumbnailUrl || '',
+      thumbnailUrl: this.thumbnailUrl || '',
+      file: this.videoFile,
+      thumbnailFile: this.thumbnailFile
+    };
+
+    this.videoUploaded.emit(video);
   }
 }

@@ -1,14 +1,9 @@
 import { Injectable } from '@angular/core';
+import { Video } from './video.service';
 
-export interface LocalVideo {
-  id: string;
-  title: string;
-  description: string;
+export interface LocalVideo extends Video {
   file: File;
-  thumbnailUrl: string;
-  thumbnail: string;
-  filePath: string;
-  videoUrl: string;
+  thumbnailFile: File | null;
 }
 
 @Injectable({
@@ -16,24 +11,24 @@ export interface LocalVideo {
 })
 export class LocalVideoService {
   private videos: LocalVideo[] = [];
-  private readonly VIDEOS_DIR = '/assets/videos/';
 
   constructor() {
-    // Charger les vidéos depuis le localStorage
-    const storedVideos = localStorage.getItem('localVideos');
-    if (storedVideos) {
-      this.videos = JSON.parse(storedVideos);
+    this.loadVideos();
+  }
+
+  private loadVideos() {
+    const savedVideos = localStorage.getItem('localVideos');
+    if (savedVideos) {
+      const parsedVideos = JSON.parse(savedVideos);
+      this.videos = parsedVideos.map((video: any) => ({
+        ...video,
+        file: new File([], video.filePath),
+        thumbnailFile: video.thumbnailPath ? new File([], video.thumbnailPath) : null
+      }));
     }
   }
 
-  addVideo(video: LocalVideo): void {
-    // Générer un nom de fichier unique
-    const fileName = `${Date.now()}-${video.file.name}`;
-    video.filePath = this.VIDEOS_DIR + fileName;
-
-    // Créer une URL pour la vidéo
-    video.videoUrl = URL.createObjectURL(video.file);
-
+  addVideo(video: LocalVideo) {
     this.videos.push(video);
     this.saveVideos();
   }
@@ -46,20 +41,22 @@ export class LocalVideoService {
     return this.videos.find(video => video.id === id);
   }
 
-  deleteVideo(id: string): void {
-    const video = this.videos.find(v => v.id === id);
-    if (video) {
-      // Libérer l'URL de la vidéo
-      URL.revokeObjectURL(video.videoUrl);
-      if (video.thumbnailUrl) {
-        URL.revokeObjectURL(video.thumbnailUrl);
-      }
-    }
+  deleteVideo(id: string) {
     this.videos = this.videos.filter(video => video.id !== id);
     this.saveVideos();
   }
 
-  private saveVideos(): void {
-    localStorage.setItem('localVideos', JSON.stringify(this.videos));
+  private saveVideos() {
+    const videosToSave = this.videos.map(video => ({
+      id: video.id,
+      title: video.title,
+      description: video.description,
+      videoUrl: video.videoUrl,
+      thumbnail: video.thumbnail,
+      thumbnailUrl: video.thumbnailUrl,
+      filePath: video.file.name,
+      thumbnailPath: video.thumbnailFile?.name || null
+    }));
+    localStorage.setItem('localVideos', JSON.stringify(videosToSave));
   }
 }

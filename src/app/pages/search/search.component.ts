@@ -4,13 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { SearchService } from '../../services/search.service';
 import { PlaylistService } from '../../services/playlist.service';
 import { PlaylistSelectorComponent } from '../../components/playlist-selector/playlist-selector.component';
-
-interface Video {
-  id: string;
-  title: string;
-  thumbnail: string;
-  description: string;
-}
+import { Video } from '../../services/video.service';
 
 @Component({
   selector: 'app-search',

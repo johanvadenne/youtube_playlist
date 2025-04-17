@@ -1,11 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
-
-interface Video {
-  id: string;
-  title: string;
-  thumbnail: string;
-}
+import { Video } from './video.service';
 
 interface Playlist {
   id: string;

@@ -5,7 +5,7 @@ import { VideoUploadComponent } from '../../components/video-upload/video-upload
 import { LocalVideoService, LocalVideo } from '../../services/local-video.service';
 import { PlaylistService } from '../../services/playlist.service';
 import { PlaylistSelectorComponent } from '../../components/playlist-selector/playlist-selector.component';
-import { Video } from '../../interfaces/video.interface';
+import { Video } from '../../services/video.service';
 
 @Component({
   selector: 'app-upload',
@@ -13,63 +13,60 @@ import { Video } from '../../interfaces/video.interface';
   imports: [CommonModule, VideoUploadComponent, PlaylistSelectorComponent],
   template: `
     <div class="upload-page">
+      <h1>Ajouter une vidéo</h1>
       <app-video-upload (videoUploaded)="onVideoUploaded($event)"></app-video-upload>
-
       <app-playlist-selector
+        *ngIf="isPlaylistSelectorOpen"
         [isOpen]="isPlaylistSelectorOpen"
-        [video]="convertedVideo!"
-        (closeModal)="closePlaylistSelector()"
-        (playlistSelected)="onPlaylistSelected($event)">
-      </app-playlist-selector>
+        [video]="selectedVideo!"
+        (close)="closePlaylistSelector()"
+        (playlistSelected)="onPlaylistSelected($event)"
+      ></app-playlist-selector>
     </div>
   `,
   styles: [`
     .upload-page {
-      padding: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
     }
   `]
 })
 export class UploadComponent {
   isPlaylistSelectorOpen = false;
-  selectedVideo: LocalVideo | null = null;
-  convertedVideo: Video | null = null;
+  selectedVideo: Video | null = null;
 
   constructor(
+    private router: Router,
     private localVideoService: LocalVideoService,
-    private playlistService: PlaylistService,
-    private router: Router
+    private playlistService: PlaylistService
   ) {}
 
   onVideoUploaded(video: LocalVideo) {
     this.localVideoService.addVideo(video);
-    this.selectedVideo = video;
-    this.convertedVideo = {
+    this.selectedVideo = {
       id: video.id,
       title: video.title,
-      thumbnail: video.thumbnail,
       description: video.description,
-      publishedAt: new Date().toISOString(),
-      channelTitle: 'Ma chaîne',
-      viewCount: '0'
+      videoUrl: video.videoUrl,
+      thumbnail: video.thumbnail,
+      thumbnailUrl: video.thumbnailUrl
     };
     this.isPlaylistSelectorOpen = true;
   }
 
   closePlaylistSelector() {
     this.isPlaylistSelectorOpen = false;
-    this.selectedVideo = null;
-    this.convertedVideo = null;
     this.router.navigate(['/']);
   }
 
   onPlaylistSelected(playlistId: string) {
     if (this.selectedVideo) {
-      this.playlistService.addVideoToPlaylist(playlistId, {
-        id: this.selectedVideo.id,
-        title: this.selectedVideo.title,
-        thumbnail: this.selectedVideo.thumbnail
-      });
-      this.closePlaylistSelector();
+      this.playlistService.addVideoToPlaylist(playlistId, this.selectedVideo);
     }
+    this.closePlaylistSelector();
   }
 }

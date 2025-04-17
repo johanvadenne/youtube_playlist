@@ -2,12 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PlaylistService } from '../../services/playlist.service';
-
-interface Video {
-  id: string;
-  title: string;
-  thumbnail: string;
-}
+import { Video } from '../../services/video.service';
 
 interface Playlist {
   id: string;
@@ -99,7 +94,7 @@ interface Playlist {
       align-items: center;
       padding: 0.5rem 0;
     }
-    .playlist-item input {
+    .playlist-item input[type="radio"] {
       margin-right: 0.5rem;
     }
     .new-playlist {
@@ -113,26 +108,36 @@ interface Playlist {
       border: 1px solid #ddd;
       border-radius: 4px;
     }
+    .new-playlist button {
+      padding: 0.5rem 1rem;
+      background-color: #f0f0f0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
     .modal-footer {
       padding: 1rem;
       border-top: 1px solid #ddd;
       display: flex;
       justify-content: flex-end;
-      gap: 1rem;
+      gap: 0.5rem;
     }
-    button {
+    .modal-footer button {
       padding: 0.5rem 1rem;
       border: none;
       border-radius: 4px;
       cursor: pointer;
     }
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    .modal-footer button:first-child {
+      background-color: #f0f0f0;
     }
-    button:not(:disabled) {
+    .modal-footer button:last-child {
       background-color: #ff0000;
       color: white;
+    }
+    .modal-footer button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
   `]
 })
@@ -157,7 +162,6 @@ export class PlaylistSelectorComponent {
   confirm() {
     if (this.selectedPlaylistId) {
       this.playlistSelected.emit(this.selectedPlaylistId);
-      this.close();
     }
   }
 
