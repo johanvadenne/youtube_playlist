@@ -1,0 +1,29 @@
+<div class="upload-form">
+  <div class="form-group">
+    <label for="title">Titre</label>
+    <input type="text" id="title" [(ngModel)]="title" required>
+  </div>
+
+  <div class="form-group">
+    <label for="description">Description</label>
+    <textarea id="description" [(ngModel)]="description"></textarea>
+  </div>
+
+  <div class="form-group">
+    <label for="video">Vidéo</label>
+    <input type="file" id="video" (change)="onVideoSelected($event)" accept="video/*" required>
+    <div class="preview" *ngIf="videoUrl">
+      <video [src]="videoUrl" controls></video>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="thumbnail">Miniature (optionnel)</label>
+    <input type="file" id="thumbnail" (change)="onThumbnailSelected($event)" accept="image/*">
+    <div class="preview" *ngIf="thumbnailUrl">
+      <img [src]="thumbnailUrl" alt="Aperçu de la miniature">
+    </div>
+  </div>
+
+  <button type="button" (click)="onSubmit()" [disabled]="!isValid()">Uploader</button>
+</div>

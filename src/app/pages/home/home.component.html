@@ -1,0 +1,29 @@
+<div class="home-container">
+  <h1>Vos vidéos</h1>
+
+  <div class="videos-grid">
+    <div class="video-card" *ngFor="let video of localVideos">
+      <div class="thumbnail" (click)="playVideo(video)">
+        <img [src]="video.thumbnailUrl || '/assets/default-thumbnail.svg'" [alt]="video.title">
+        <div class="play-button">▶</div>
+      </div>
+      <div class="video-info">
+        <h3>{{ video.title }}</h3>
+        <p>{{ video.description }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="playlists-section">
+    <h2>Vos playlists</h2>
+    <div class="playlists-grid">
+      <div class="playlist-card" *ngFor="let playlist of playlists" (click)="viewPlaylist(playlist.id)">
+        <div class="playlist-thumbnail">
+          <img [src]="getPlaylistThumbnail(playlist)" [alt]="playlist.name">
+          <div class="video-count">{{ playlist.videos.length }} vidéos</div>
+        </div>
+        <h3>{{ playlist.name }}</h3>
+      </div>
+    </div>
+  </div>
+</div>
